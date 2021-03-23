@@ -50,7 +50,7 @@ jobs:
         resource: kubectl
         params:
           kubectl: >
-            apply -f git/ci/concourse/prune-host-docker-system.job.yaml
+            apply -f https://raw.githubusercontent.com/aochen-jli/rankings-cicd/main/ci/prune-host-docker-system.job.yaml
           wait_until_ready: 300
       - put: prune-registry
         resource: kubectl
