@@ -51,7 +51,7 @@ jobs:
         params:
           kubectl: >
             apply -f https://raw.githubusercontent.com/aochen-jli/rankings-cicd/main/ci/prune-host-docker-system.job.yaml
-          wait_until_ready: 300
+          wait_until_ready: 600
       - put: prune-registry
         resource: kubectl
         params:
@@ -59,7 +59,7 @@ jobs:
             exec -it $(kubectl get pods -l app=docker-registry -o custom-columns=:metadata.name)
             --
             /bin/registry garbage-collect /etc/docker/registry/config.yml --delete-untagged
-          wait_until_ready: 300
+          wait_until_ready: 600
       - put: docker
         params:
           build: git
@@ -82,4 +82,4 @@ jobs:
           kubectl: >
             rollout restart deployment
             $(kubectl get deployment -l app.kubernetes.io/name=visualizations -o custom-columns=:metadata.name)
-          wait_until_ready: 300
+          wait_until_ready: 600
