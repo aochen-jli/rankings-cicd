@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: "yes"
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    volume: pv0001
+  name: pv0001
+  resourceVersion: "227035"
+  selfLink: /api/v1/persistentvolumes/pv0001
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/pv-data/pv0001
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+  volumeMode: Filesystem
+status:
+  phase: Bound
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: "yes"
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    volume: pv0002
+  name: pv0002
+  resourceVersion: "227035"
+  selfLink: /api/v1/persistentvolumes/pv0002
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/pv-data/pv0002
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+  volumeMode: Filesystem
+status:
+  phase: Bound
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: "yes"
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    volume: pv0003
+  name: pv0003
+  resourceVersion: "227035"
+  selfLink: /api/v1/persistentvolumes/pv0003
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/pv-data/pv0003
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+  volumeMode: Filesystem
+status:
+  phase: Bound
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ annotations:
+   pv.kubernetes.io/bound-by-controller: "yes"
+ finalizers:
+ - kubernetes.io/pv-protection
+ labels:
+   volume: pv0004
+ name: pv0004
+ resourceVersion: "227035"
+ selfLink: /api/v1/persistentvolumes/pv0004
+spec:
+ accessModes:
+ - ReadWriteOnce
+ capacity:
+   storage: 10Gi
+ hostPath:
+   path: /mnt/pv-data/pv0004
+   type: ""
+ persistentVolumeReclaimPolicy: Recycle
+ volumeMode: Filesystem
+status:
+ phase: Bound
