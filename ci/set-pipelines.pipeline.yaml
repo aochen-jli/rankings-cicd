@@ -8,12 +8,14 @@ resources:
 
 jobs:
   - name: set-self
+    serial: true
     plan:
       - get: git
         trigger: true
       - set_pipeline: set-pipelines
         file: git/ci/set-pipelines.pipeline.yaml
   - name: set-others
+    serial: true
     plan:
       - get: git
         passed: [set-self]

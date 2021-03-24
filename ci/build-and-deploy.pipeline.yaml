@@ -43,6 +43,7 @@ resources:
 
 jobs:
   - name: build-image
+    serial: true
     plan:
       - get: git
         trigger: true
@@ -66,6 +67,7 @@ jobs:
         get_params: {skip_download: true}
 
   - name: deploy
+    serial: true
     plan:
       - get: git
         passed: [build-image]
