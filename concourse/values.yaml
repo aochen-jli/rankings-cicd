@@ -2403,7 +2403,7 @@ postgresql:
   ## Provide a name to substitute for the full name of postgresql resources
   ## ps.: Resources will not be appended with "-postgresql"
   ##
-  fullnameOverride:
+  fullnameOverride: concourse-postgresql
 
   ### PostgreSQL User to create.
   ##
