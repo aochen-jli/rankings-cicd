@@ -1,24 +1,27 @@
 ---
 resources:
-  - name: git
+  - name: pipelines-git
     type: git
     icon: github
     source:
       uri: https://github.com/aochen-jli/rankings-cicd
+      branch: main
+      paths:
+        - pipelines/**/*
 
 jobs:
   - name: set-self
     serial: true
     plan:
-      - get: git
+      - get: pipelines-git
         trigger: true
       - set_pipeline: set-pipelines
-        file: git/pipelines/set-pipelines.pipeline.yaml
+        file: pipelines-git/pipelines/set-pipelines.pipeline.yaml
   - name: set-others
     serial: true
     plan:
-      - get: git
+      - get: pipelines-git
         passed: [set-self]
         trigger: true
       - set_pipeline: build-and-deploy
-        file: git/pipelines/build-and-deploy.pipeline.yaml
+        file: pipelines-git/pipelines/build-and-deploy.pipeline.yaml
