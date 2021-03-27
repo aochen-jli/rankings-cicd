@@ -294,7 +294,7 @@ concourse:
 
     ## Method by which a worker is selected during container placement.
     ## Possible values: volume-locality | random | fewest-build-containers | limit-active-tasks | limit-active-containers | limit-active-volumes
-    containerPlacementStrategy: limit-active-tasks
+    containerPlacementStrategy: volume-locality
 
     ## Instead of specifying a single placement strategy, configure a chain of
     ## them to be applied in order.
@@ -313,7 +313,7 @@ concourse:
     ##
     ## ref: https://concourse-ci.org/container-placement.html#limit-active-tasks-strategy
     ##
-    limitActiveTasks: 1
+    limitActiveTasks:
 
     ## Maximum allowed number of active containers per worker.
     ##
