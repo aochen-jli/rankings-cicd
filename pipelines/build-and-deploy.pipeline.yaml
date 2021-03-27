@@ -25,6 +25,11 @@ resources:
     icon: github
     source:
       uri: https://github.com/aochen-jli/visualizations
+      branch: main
+      ignore_paths:
+        - README.md
+        - .gitignore
+        - examples/**/*
   - name: docker
     type: docker-image
     icon: docker
