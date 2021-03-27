@@ -92,7 +92,8 @@ jobs:
             - data-git/visualizations/values.yaml  # The repository-specific values should override the defaults
           override_values:
             # Should match the configuration for the data-git resource
-            repositoryPath: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
+            - key: repositoryPath
+              value: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
           release: visualizations
       - put: restart-deployments
         resource: kubectl
