@@ -1,4 +1,4 @@
-# Rankings CI/CD
+# Visualizations CI/CD
 This repository contains the configuration used to build the CI/CD pipeline for Endcoronavirus.org's 
 [Green Zone Visualizations](https://github.com/vbrunsch/rankings/).
 ## Deployment
