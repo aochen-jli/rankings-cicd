@@ -12,11 +12,11 @@ jobs:
       - get: git
         trigger: true
       - set_pipeline: set-pipelines
-        file: git/ci/set-pipelines.pipeline.yaml
+        file: git/pipelines/set-pipelines.pipeline.yaml
   - name: set-others
     plan:
       - get: git
         passed: [set-self]
         trigger: true
       - set_pipeline: build-and-deploy
-        file: git/ci/build-and-deploy.pipeline.yaml
+        file: git/pipelines/build-and-deploy.pipeline.yaml

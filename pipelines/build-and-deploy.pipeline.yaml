@@ -11,11 +11,20 @@ resource_types:
       repository: typositoire/concourse-helm3-resource
 
 resources:
-  - name: git
+  - name: data-git
     type: git
     icon: github
     source:
+      # These settings should match the repositoryPath set in the deploy job
       uri: https://github.com/vbrunsch/rankings
+      branch: main
+      paths:
+        - visualizations/**/*
+  - name: app-git
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/aochen-jli/visualizations
   - name: docker
     type: docker-image
     icon: docker
@@ -44,13 +53,13 @@ resources:
 jobs:
   - name: build-image
     plan:
-      - get: git
+      - get: app-git
         trigger: true
       - put: prune-system
         resource: kubectl
         params:
           kubectl: >
-            apply -f https://raw.githubusercontent.com/aochen-jli/rankings-cicd/main/ci/prune-host-docker-system.job.yaml
+            apply -f https://raw.githubusercontent.com/aochen-jli/visualizations-cicd/main/pipelines/jobs/prune-host-docker-system.job.yaml
           wait_until_ready: 600
       - put: prune-registry
         resource: kubectl
@@ -62,19 +71,26 @@ jobs:
           wait_until_ready: 600
       - put: docker
         params:
-          build: git
+          build: app-git
         get_params: {skip_download: true}
 
   - name: deploy
     plan:
-      - get: git
+      - get: app-git
         passed: [build-image]
+        trigger: true
+      - get: data-git
         trigger: true
       - put: upgrade-deployments
         resource: helm
         params:
-          chart: git/ci/helm/visualizations/
-          values: git/ci/helm/visualizations/values.yaml
+          chart: app-git/helm/chart/
+          values:
+            - app-git/helm/chart/values.yaml
+            - data-git/visualizations/values.yaml  # The repository-specific values should override the defaults
+          override_values:
+            # Should match the configuration for the data-git resource
+            repositoryPath: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
           release: visualizations
       - put: restart-deployments
         resource: kubectl
