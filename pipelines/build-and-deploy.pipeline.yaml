@@ -96,9 +96,9 @@ jobs:
             - app-git/helm/chart/values.yaml
             - data-git/visualizations/values.yaml  # The repository-specific values should override the defaults
           override_values:
-            # Should match the configuration for the data-git resource
-            - key: repositoryPath
+            - key: repositoryPath  # Should match the configuration for the data-git resource
               value: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
+              type: string
           release: visualizations
       - put: restart-deployments
         resource: kubectl
