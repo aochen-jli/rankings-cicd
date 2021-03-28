@@ -19,7 +19,7 @@ resources:
       uri: https://github.com/vbrunsch/rankings
       branch: main
       paths:
-        - visualizations/**/*
+        - visualizations
   - name: app-git
     type: git
     icon: github
@@ -29,7 +29,7 @@ resources:
       ignore_paths:
         - README.md
         - .gitignore
-        - examples/**/*
+        - examples
   - name: docker
     type: docker-image
     icon: docker
