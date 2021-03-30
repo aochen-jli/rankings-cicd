@@ -387,12 +387,10 @@ controller:
     ports:
       http: 80
       https: 443
-      vis-docker-registry: 5000
 
     targetPorts:
       http: http
       https: https
-      vis-docker-registry: vis-docker-registry
 
     type: LoadBalancer
 
@@ -735,9 +733,7 @@ imagePullSecrets: []
 # TCP service key:value pairs
 # Ref: https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx/examples/tcp
 ##
-tcp: {
-  5000: "default/vis-docker-registry:5000"
-}
+tcp: {}
 #  8080: "default/example-tcp-svc:9000"
 
 # UDP service key:value pairs
