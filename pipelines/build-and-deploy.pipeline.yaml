@@ -34,8 +34,7 @@ resources:
     type: docker-image
     icon: docker
     source:
-      repository: vis-docker-registry:5000/visualizations
-      insecure_registries: ["vis-docker-registry:5000"]
+      repository: registry.nocovid.group/visualizations
       tag_as_latest: true
   - name: kubectl
     type: kubernetes
