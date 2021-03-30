@@ -35,6 +35,8 @@ resources:
     icon: docker
     source:
       repository: registry.nocovid.group/visualizations
+      username: ((regcred.docker-username))
+      password: ((regcred.docker-password))
       tag_as_latest: true
   - name: kubectl
     type: kubernetes
