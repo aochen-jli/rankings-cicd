@@ -30,5 +30,5 @@ This repository contains the configuration used to build the CI/CD pipeline for 
    * [Metallb](https://metallb.universe.tf/installation/#installation-by-manifest) (then, apply the metallb/config.yaml) 
    * Docker Registry: `helm install vis twuni/docker-registry -f values.yaml`
    * Concourse: `helm install concourse -f values.yaml concourse/concourse`
-4. Set the pipelines in the ci folder.
+4. Set the pipelines.
 4. Clean up!
