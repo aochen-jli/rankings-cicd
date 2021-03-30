@@ -9,8 +9,8 @@ This repository contains the configuration used to build the CI/CD pipeline for 
        the `concourse.auth.localUser` value
      * If you are using the PostgreSQL chart dependency, configure the username and password
    * For the Docker Registry, you can either use a credential manager or generate credentials 
-     using htpasswd and plug it into the values.yml. Then, store the creds in the secret `default/regcred` of type 
-     `kubernetes.io/dockerconfigjson` [(instructions here)](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line), and a secret `concourse-main/regcred` of type generic with keys docker-username and docker-password,
+     using htpasswd and plug it into the values.yml. If using basic auth with httpasswd, store the creds in the secret `default/regcred` of type 
+     `kubernetes.io/dockerconfigjson` [(instructions here)](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line), and `concourse-main/regcred` of type generic with keys docker-username and docker-password,
      and with `main` being the team that the build pipeline is running on.
      * `kubectl create secret generic regcred -n concourse-main --from-literal=docker-username=<username> --from-literal=docker-password=<password>`
    * For Ingress-NGINX, if you are going to use SSL termination, create a TLS secret and reference it in 
