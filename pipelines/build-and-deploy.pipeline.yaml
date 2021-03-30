@@ -93,16 +93,17 @@ jobs:
           chart: app-git/helm/chart/
           values:
             - app-git/helm/chart/values.yaml
-            - data-git/visualizations/values.yaml  # The repository-specific values should override the defaults
+            - data-git/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
           override_values:
             - key: repositoryPath  # Should match the configuration for the data-git resource
               value: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
               type: string
-          release: visualizations
+          release: visualizations-vbrunsch  # Use a unique release name
       - put: restart-deployments
         resource: kubectl
         params:
+          # Ensure the release name specified for visualizations/release matches the release specified above
           kubectl: >
             rollout restart deployment
-            $(kubectl get deployment -l app.kubernetes.io/name=visualizations -o custom-columns=:metadata.name)
+            $(kubectl get deployment -l visualizations/release=visualizations-vbrunsch -o custom-columns=:metadata.name)
           wait_until_ready: 600
