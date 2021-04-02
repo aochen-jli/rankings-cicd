@@ -25,5 +25,5 @@ jobs:
         trigger: true
       - set_pipeline: deploy-vbrunsch
         file: pipelines-git/pipelines/deploy-vbrunsch.pipeline.yaml
-      - set_pipeline: deploy-landing
-        file: pipelines-git/pipelines/deploy-landing.pipeline.yaml
+      - set_pipeline: deploy-home
+        file: pipelines-git/pipelines/deploy-home.pipeline.yaml

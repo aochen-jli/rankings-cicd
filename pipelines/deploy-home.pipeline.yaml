@@ -15,11 +15,11 @@ resources:
       branch: main
       paths:
         - visualizations/values.yaml
-  - name: landing-git
+  - name: home-git
     type: git
     icon: github
     source:
-      uri: https://github.com/aochen-jli/visualizations-landing
+      uri: https://github.com/aochen-jli/visualizations-home
       branch: main
       ignore_paths:
         - README.md
@@ -28,7 +28,7 @@ resources:
     type: docker-image
     icon: docker
     source:
-      repository: registry.nocovid.group/landing
+      repository: registry.nocovid.group/visualizations-home
       username: ((regcred.docker-username))
       password: ((regcred.docker-password))
       tag_as_latest: true
@@ -45,7 +45,7 @@ jobs:
   - name: build-image
     serial: true
     plan:
-      - get: landing-git
+      - get: home-git
         trigger: true
       - put: prune-system
         resource: kubectl
@@ -63,7 +63,7 @@ jobs:
           wait_until_ready: 600
       - put: docker
         params:
-          build: landing-git
+          build: home-git
         get_params: {skip_download: true}
 
   - name: deploy
@@ -71,7 +71,7 @@ jobs:
     plan:
       - get: vbrunsch-git
         trigger: true
-      - get: landing-git
+      - get: home-git
         passed: [build-image]
         trigger: true
       - task: get-regions
@@ -87,6 +87,7 @@ jobs:
           run:
             path: sh
             args:
+              - -exc
               - |
                 yq eval '.regions' vbrunsch-git/visualizations/values.yaml >> regions.yaml
           outputs:
@@ -101,10 +102,10 @@ jobs:
       - put: upgrade-deployment
         resource: kubectl
         params:
-          kubectl: apply -f landing-git/ci/visualizations-landing.deployment.yaml
+          kubectl: apply -f home-git/ci/visualizations-home.deployment.yaml
           wait_until_ready: 600
       - put: restart-deployment
         resource: kubectl
         params:
-          kubectl: rollout restart -f landing-git/ci/visualizations-landing.deployment.yaml
+          kubectl: rollout restart -f home-git/ci/visualizations-home.deployment.yaml
           wait_until_ready: 600
