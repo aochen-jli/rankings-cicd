@@ -23,5 +23,7 @@ jobs:
       - get: pipelines-git
         passed: [set-self]
         trigger: true
-      - set_pipeline: build-and-deploy
-        file: pipelines-git/pipelines/build-and-deploy.pipeline.yaml
+      - set_pipeline: deploy-vbrunsch
+        file: pipelines-git/pipelines/deploy-vbrunsch.pipeline.yaml
+      - set_pipeline: deploy-landing
+        file: pipelines-git/pipelines/deploy-landing.pipeline.yaml

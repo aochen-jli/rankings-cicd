@@ -1,0 +1,111 @@
+---
+resource_types:
+  - name: kubernetes
+    type: docker-image
+    source:
+      repository: zlabjp/kubernetes-resource
+      tag: "1.17"
+  - name: helm
+    type: docker-image
+    source:
+      repository: typositoire/concourse-helm3-resource
+
+resources:
+  - name: vbrunsch-git
+    type: git
+    icon: github
+    source:
+      # These settings should match the repositoryPath set in the deploy job
+      uri: https://github.com/vbrunsch/rankings
+      branch: main
+      paths:
+        - visualizations
+  - name: vis-git
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/aochen-jli/visualizations
+      branch: main
+      ignore_paths:
+        - README.md
+        - .gitignore
+        - examples
+  - name: docker
+    type: docker-image
+    icon: docker
+    source:
+      repository: registry.nocovid.group/visualizations
+      username: ((regcred.docker-username))
+      password: ((regcred.docker-password))
+      tag_as_latest: true
+  - name: kubectl
+    type: kubernetes
+    icon: kubernetes
+    source:
+      server: https://kubernetes:443
+      namespace: default
+      certificate_authority: ((cluster-auth.certificate-authority-data))
+      token: ((cluster-auth.token))
+  - name: helm
+    type: helm
+    icon: ship-wheel
+    source:
+      cluster_url: https://kubernetes:443
+      namespace: default
+      helm_history_max: 5
+      cluster_ca: ((cluster-auth.certificate-authority-data))
+      token: ((cluster-auth.token))
+
+jobs:
+  - name: build-image
+    serial: true
+    plan:
+      - get: vis-git
+        trigger: true
+      - put: prune-system
+        resource: kubectl
+        params:
+          kubectl: >
+            apply -f https://raw.githubusercontent.com/aochen-jli/visualizations-cicd/main/pipelines/jobs/prune-host-docker-system.job.yaml
+          wait_until_ready: 600
+      - put: prune-registry
+        resource: kubectl
+        params:
+          kubectl: >
+            exec -it $(kubectl get pods -l app=docker-registry -o custom-columns=:metadata.name)
+            --
+            /bin/registry garbage-collect /etc/docker/registry/config.yml --delete-untagged
+          wait_until_ready: 600
+      - put: docker
+        params:
+          build: vis-git
+        get_params: {skip_download: true}
+
+  - name: deploy
+    serial: true
+    plan:
+      - get: vis-git
+        passed: [build-image]
+        trigger: true
+      - get: vbrunsch-git
+        trigger: true
+      - put: upgrade-deployments
+        resource: helm
+        params:
+          chart: vis-git/helm/chart/
+          values:
+            - vis-git/helm/chart/values.yaml
+            - vbrunsch-git/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
+          override_values:
+            - key: repositoryPath  # Should match the configuration for the vbrunsch-git resource
+              value: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
+              type: string
+          release: visualizations-vbrunsch  # Use a unique release name
+      - put: restart-deployments
+        resource: kubectl
+        params:
+          # Ensure the release name specified for visualizations/release matches the release specified above
+          kubectl: >
+            rollout restart deployment
+            $(kubectl get deployment -l visualizations/release=visualizations-vbrunsch -o custom-columns=:metadata.name)
+          wait_until_ready: 600
