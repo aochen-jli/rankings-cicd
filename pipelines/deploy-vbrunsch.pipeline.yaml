@@ -20,7 +20,7 @@ resources:
       branch: main
       paths:
         - visualizations
-  - name: vis-git
+  - name: app-git
     type: git
     icon: github
     source:
@@ -60,7 +60,7 @@ jobs:
   - name: build-image
     serial: true
     plan:
-      - get: vis-git
+      - get: app-git
         trigger: true
       - put: prune-system
         resource: kubectl
@@ -78,13 +78,13 @@ jobs:
           wait_until_ready: 600
       - put: docker
         params:
-          build: vis-git
+          build: app-git
         get_params: {skip_download: true}
 
   - name: deploy
     serial: true
     plan:
-      - get: vis-git
+      - get: app-git
         passed: [build-image]
         trigger: true
       - get: vbrunsch-git
@@ -92,9 +92,9 @@ jobs:
       - put: upgrade-deployments
         resource: helm
         params:
-          chart: vis-git/helm/chart/
+          chart: app-git/helm/chart/
           values:
-            - vis-git/helm/chart/values.yaml
+            - app-git/helm/chart/values.yaml
             - vbrunsch-git/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
           override_values:
             - key: repositoryPath  # Should match the configuration for the vbrunsch-git resource
