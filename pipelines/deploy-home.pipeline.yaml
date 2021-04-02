@@ -89,15 +89,15 @@ jobs:
             args:
               - -exc
               - |
-                yq eval '.regions' vbrunsch-git/visualizations/values.yaml >> regions.yaml
+                printf "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: visualizations-current-regions\ndata:\n  yaml: |\n" >> regions/config.yaml
+                yq eval '.regions' vbrunsch-git/visualizations/values.yaml | awk '{ print "    " $0 }' >> regions/config.yaml
+                cat regions/config.yaml
           outputs:
-            - name: regions.yaml
+            - name: regions
       - put: update-config
         resource: kubectl
         params:
-          kubectl: >
-            create configmap visualizations-current-regions
-            --from-literal=yaml=$(cat regions.yaml) -o yaml --dry-run | kubectl apply -f -
+          kubectl: apply -f regions/config.yaml
           wait_until_ready: 0
       - put: upgrade-deployment
         resource: kubectl
