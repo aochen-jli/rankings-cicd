@@ -7,7 +7,7 @@ resource_types:
       tag: "1.17"
 
 resources:
-  - name: vbrunsch-git
+  - name: rankings-intl
     type: git
     icon: github
     source:
@@ -15,7 +15,7 @@ resources:
       branch: main
       paths:
         - visualizations/values.yaml
-  - name: home-git
+  - name: home-app
     type: git
     icon: github
     source:
@@ -45,7 +45,7 @@ jobs:
   - name: build-image
     serial: true
     plan:
-      - get: home-git
+      - get: home-app
         trigger: true
       - put: prune-system
         resource: kubectl
@@ -63,15 +63,15 @@ jobs:
           wait_until_ready: 600
       - put: docker
         params:
-          build: home-git
+          build: home-app
         get_params: {skip_download: true}
 
   - name: deploy
     serial: true
     plan:
-      - get: vbrunsch-git
+      - get: rankings-intl
         trigger: true
-      - get: home-git
+      - get: home-app
         passed: [build-image]
         trigger: true
       - task: get-regions
@@ -83,14 +83,14 @@ jobs:
               repository: mikefarah/yq
               tag: "4"
           inputs:
-            - name: vbrunsch-git
+            - name: rankings-intl
           run:
             path: sh
             args:
               - -exc
               - |
                 printf "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: visualizations-current-regions\ndata:\n  yaml: |\n" >> regions/config.yaml
-                yq eval '.regions' vbrunsch-git/visualizations/values.yaml | awk '{ print "    " $0 }' >> regions/config.yaml
+                yq eval '.regions' rankings-intl/visualizations/values.yaml | awk '{ print "    " $0 }' >> regions/config.yaml
                 cat regions/config.yaml
           outputs:
             - name: regions
@@ -102,10 +102,10 @@ jobs:
       - put: upgrade-deployment
         resource: kubectl
         params:
-          kubectl: apply -f home-git/ci/visualizations-home.deployment.yaml
+          kubectl: apply -f home-app/ci/
           wait_until_ready: 600
       - put: restart-deployment
         resource: kubectl
         params:
-          kubectl: rollout restart -f home-git/ci/visualizations-home.deployment.yaml
+          kubectl: rollout restart -f home-app/ci/visualizations-home.deployment.yaml
           wait_until_ready: 600

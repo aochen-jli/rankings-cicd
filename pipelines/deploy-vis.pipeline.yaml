@@ -11,7 +11,7 @@ resource_types:
       repository: typositoire/concourse-helm3-resource
 
 resources:
-  - name: vbrunsch-git
+  - name: rankings-intl
     type: git
     icon: github
     source:
@@ -20,7 +20,7 @@ resources:
       branch: main
       paths:
         - visualizations
-  - name: app-git
+  - name: vis-app
     type: git
     icon: github
     source:
@@ -60,7 +60,7 @@ jobs:
   - name: build-image
     serial: true
     plan:
-      - get: app-git
+      - get: vis-app
         trigger: true
       - put: prune-system
         resource: kubectl
@@ -78,34 +78,34 @@ jobs:
           wait_until_ready: 600
       - put: docker
         params:
-          build: app-git
+          build: vis-app
         get_params: {skip_download: true}
 
   - name: deploy
     serial: true
     plan:
-      - get: app-git
+      - get: vis-app
         passed: [build-image]
         trigger: true
-      - get: vbrunsch-git
+      - get: rankings-intl
         trigger: true
       - put: upgrade-deployments
         resource: helm
         params:
-          chart: app-git/helm/chart/
+          chart: vis-app/helm/chart/
           values:
-            - app-git/helm/chart/values.yaml
-            - vbrunsch-git/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
+            - vis-app/helm/chart/values.yaml
+            - rankings-intl/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
           override_values:
-            - key: repositoryPath  # Should match the configuration for the vbrunsch-git resource
+            - key: repositoryPath  # Should match the configuration for the rankings-intl resource
               value: https://raw.githubusercontent.com/vbrunsch/rankings/main/visualizations
               type: string
-          release: visualizations-vbrunsch  # Use a unique release name
+          release: visualizations-intl  # Use a unique release name
       - put: restart-deployments
         resource: kubectl
         params:
           # Ensure the release name specified for visualizations/release matches the release specified above
           kubectl: >
             rollout restart deployment
-            $(kubectl get deployment -l visualizations/release=visualizations-vbrunsch -o custom-columns=:metadata.name)
+            $(kubectl get deployment -l vis-app/release=visualizations-intl -o custom-columns=:metadata.name)
           wait_until_ready: 600
