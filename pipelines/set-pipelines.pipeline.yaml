@@ -1,6 +1,6 @@
 ---
 resources:
-  - name: pipelines-git
+  - name: pipelines
     type: git
     icon: github
     source:
@@ -13,17 +13,17 @@ jobs:
   - name: set-self
     serial: true
     plan:
-      - get: pipelines-git
+      - get: pipelines
         trigger: true
       - set_pipeline: set-pipelines
-        file: pipelines-git/pipelines/set-pipelines.pipeline.yaml
+        file: pipelines/pipelines/set-pipelines.pipeline.yaml
   - name: set-others
     serial: true
     plan:
-      - get: pipelines-git
+      - get: pipelines
         passed: [set-self]
         trigger: true
       - set_pipeline: deploy-vis
-        file: pipelines-git/pipelines/deploy-vis.pipeline.yaml
+        file: pipelines/pipelines/deploy-vis.pipeline.yaml
       - set_pipeline: deploy-home
-        file: pipelines-git/pipelines/deploy-home.pipeline.yaml
+        file: pipelines/pipelines/deploy-home.pipeline.yaml
