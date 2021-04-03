@@ -102,5 +102,5 @@ jobs:
           # Ensure the release name specified for visualizations/release matches the release specified above
           kubectl: >
             rollout restart deployment
-            $(kubectl get deployment -l vis-app/release=visualizations-intl -o custom-columns=:metadata.name)
+            $(kubectl get deployment -l visualizations/release=visualizations-intl -o custom-columns=:metadata.name)
           wait_until_ready: 600
