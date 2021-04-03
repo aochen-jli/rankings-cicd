@@ -1,0 +1,24 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: mikefarah/yq
+    tag: "4"
+
+inputs:
+  - name: rankings
+
+outputs:
+  - name: home-config
+
+run:
+  path: sh
+  # for each input repository, another yq statement needs to be added to parse that repo's values.yaml
+  args:
+    - -exc
+    - |
+      printf "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: visualizations-home-config\ndata:\n  regions: |\n" >> home-config/regions.yaml
+      yq eval '.regions' rankings/visualizations/values.yaml | awk '{ print "    " $0 }' >> home-config/regions.yaml
+      cat home-config/regions.yaml

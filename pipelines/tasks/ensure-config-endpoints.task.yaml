@@ -1,0 +1,32 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: aochenjli/wait-for-endpoint
+    tag: 'latest'
+
+params:
+  HOST: nocovid.group
+  SUFFIX: visualizations
+  TIMEOUT: 120
+
+inputs:
+  - name: home-config
+
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+      echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+      apk update
+      apk add yq
+
+      for path in $(yq eval '.data.regions' home-config/regions.yaml | grep path | awk '{ print $2 }'); do
+        /wait-for-endpoint.sh -t "${TIMEOUT}" "https://${HOST}/${path}/${SUFFIX}"
+        if [ $? -ne 0 ]; then
+          exit 1
+        fi
+      done
