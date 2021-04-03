@@ -30,7 +30,7 @@ resources:
         - README.md
         - .gitignore
         - examples
-  - name: pipeline-tasks
+  - name: tasks
     type: git
     icon: github
     source:
@@ -63,14 +63,14 @@ resources:
       token: ((cluster-auth.token))
 
 jobs:
-  - name: build-image
+  - name: build
     serial: true
     plan:
       - get: vis-app
         trigger: true
-      - get: pipeline-tasks
+      - get: tasks
       - task: prune-images
-        file: pipeline-tasks/pipelines/tasks/prune-images.task.yaml
+        file: tasks/pipelines/tasks/prune-images.task.yaml
       - put: docker
         params:
           build: vis-app
@@ -80,7 +80,7 @@ jobs:
     serial: true
     plan:
       - get: vis-app
-        passed: [build-image]
+        passed: [build]
         trigger: true
       - get: rankings-intl
         trigger: true

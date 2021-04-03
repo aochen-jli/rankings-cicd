@@ -24,7 +24,7 @@ resources:
       ignore_paths:
         - README.md
         - .gitignore
-  - name: pipeline-tasks
+  - name: tasks
     type: git
     icon: github
     source:
@@ -48,14 +48,14 @@ resources:
       token: ((cluster-auth.token))
 
 jobs:
-  - name: build-image
+  - name: build
     serial: true
     plan:
       - get: home-app
         trigger: true
-      - get: pipeline-tasks
+      - get: tasks
       - task: prune-images
-        file: pipeline-tasks/pipelines/tasks/prune-images.task.yaml
+        file: tasks/pipelines/tasks/prune-images.task.yaml
       - put: docker
         params:
           build: home-app
@@ -65,19 +65,19 @@ jobs:
     serial: true
     plan:
       - get: home-app
-        passed: [build-image]
+        passed: [build]
         trigger: true
       - get: rankings-intl
         trigger: true
-      - get: pipeline-tasks
+      - get: tasks
       - task: make-home-config
-        file: pipeline-tasks/pipelines/tasks/make-home-config.task.yaml
+        file: tasks/pipelines/tasks/make-home-config.task.yaml
         input_mapping:
           rankings: rankings-intl
         output_mapping:
           home-config: home-config
       - task: ensure-config-endpoints
-        file: pipeline-tasks/pipelines/tasks/ensure-config-endpoints.task.yaml
+        file: tasks/pipelines/tasks/ensure-config-endpoints.task.yaml
         input_mapping:
           home-config: home-config
       - put: apply-home-config
