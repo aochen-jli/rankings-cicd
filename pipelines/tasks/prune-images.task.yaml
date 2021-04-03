@@ -1,0 +1,36 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: dtzar/helm-kubectl
+    tag: '3'
+
+params:
+  CLUSTER_URL: https://kubernetes:443
+  NAMESPACE: default
+  CERTIFICATE_AUTHORITY_DATA: ((cluster-auth.certificate-authority-data))
+  TOKEN: ((cluster-auth.token))
+  WAIT_FOR_READY: 600
+
+run:
+  path: sh
+  args:
+    - -ec
+    - |
+      echo "Authenticating..."
+      echo "${CERTIFICATE_AUTHORITY_DATA}" > /ca.crt
+      kubectl config set-cluster kubernetes --server="${CLUSTER_URL}" --certificate-authority="/ca.crt"
+      kubectl config set-credentials concourse-kubectl --token="${TOKEN}"
+      kubectl config set-context concourse-kubectl@kubernetes --cluster=kubernetes --namespace="${NAMESPACE}" --user=concourse-kubectl
+      kubectl config use-context concourse-kubectl@kubernetes
+      echo "Authentication complete."
+
+      echo "Pruning system..."
+      kubectl apply -f https://raw.githubusercontent.com/aochen-jli/visualizations-cicd/main/pipelines/jobs/prune-host-docker-system.job.yaml
+
+      echo "Pruning registry..."
+      kubectl exec -it $(kubectl get pods -l app=docker-registry -o custom-columns=:metadata.name) \
+      -- /bin/registry garbage-collect /etc/docker/registry/config.yml --delete-untagged
+      echo "Done!"
