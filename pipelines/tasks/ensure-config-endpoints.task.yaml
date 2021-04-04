@@ -24,7 +24,9 @@ run:
       apk update
       apk add yq
 
-      for path in $(yq eval '.data.regions' home-config/regions.yaml | grep path | awk '{ print $2 }'); do
+      for path in $(yq eval '.data.regions' home-config/regions.yaml | \
+                    yq eval 'del(.[] | select(.fake))' - | \
+                    grep path | awk '{ print $2 }'); do
         /wait-for-endpoint.sh -t "${TIMEOUT}" "https://${HOST}/${path}/${SUFFIX}"
         if [ $? -ne 0 ]; then
           exit 1
