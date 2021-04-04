@@ -78,6 +78,8 @@ jobs:
           home-config: home-config
       - task: ensure-config-endpoints
         file: tasks/pipelines/tasks/ensure-config-endpoints.task.yaml
+        params:
+          TIMEOUT: 1200
         input_mapping:
           home-config: home-config
       - put: apply-home-config
