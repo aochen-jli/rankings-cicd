@@ -7,8 +7,10 @@ image_resource:
     repository: mikefarah/yq
     tag: "4"
 
+# Can't pass in an array containing the rankings repositories, have to use this hacky solution :(
 inputs:
-  - name: rankings
+  - name: rankings-0
+  - name: rankings-1
 
 outputs:
   - name: home-config
@@ -20,5 +22,8 @@ run:
     - -exc
     - |
       printf "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: visualizations-home-config\ndata:\n  regions: |\n" >> home-config/regions.yaml
-      yq eval '.regions' rankings/visualizations/values.yaml | awk '{ print "    " $0 }' >> home-config/regions.yaml
+
+      yq eval '.regions' rankings-0/visualizations/values.yaml | awk '{ print "    " $0 }' >> home-config/regions.yaml
+      yq eval '.regions' rankings-1/visualizations/values.yaml | awk '{ print "    " $0 }' >> home-config/regions.yaml
+
       cat home-config/regions.yaml

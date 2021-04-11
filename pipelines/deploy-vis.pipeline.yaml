@@ -15,9 +15,18 @@ resources:
     type: git
     icon: github
     source:
-      # These settings should match the repositoryPath set in the deploy job
+      # These settings should match the repositoryPath set in the deploy-intl job
       uri: https://github.com/vbrunsch/rankings
       branch: main
+      paths:
+        - visualizations
+  - name: rankings-usa
+    type: git
+    icon: github
+    source:
+      # These settings should match the repositoryPath set in the deploy-usa job
+      uri: https://github.com/jsn-li/County_Ranking
+      branch: master
       paths:
         - visualizations
   - name: vis-app
@@ -76,7 +85,7 @@ jobs:
           build: vis-app
         get_params: {skip_download: true}
 
-  - name: deploy
+  - name: deploy-intl
     serial: true
     plan:
       - get: vis-app
@@ -103,4 +112,33 @@ jobs:
           kubectl: >
             rollout restart deployment
             $(kubectl get deployment -l visualizations/release=visualizations-intl -o custom-columns=:metadata.name)
+          wait_until_ready: 600
+
+  - name: deploy-usa
+    serial: true
+    plan:
+      - get: vis-app
+        passed: [build]
+        trigger: true
+      - get: rankings-usa
+        trigger: true
+      - put: upgrade-deployments
+        resource: helm
+        params:
+          chart: vis-app/helm/chart/
+          values:
+            - vis-app/helm/chart/values.yaml
+            - rankings-usa/visualizations/values.yaml  # The needs to point to the repository-specific values.yaml file
+          override_values:
+            - key: repositoryPath  # Should match the configuration for the rankings-usa resource
+              value: https://raw.githubusercontent.com/jsn-li/County_Ranking/master/visualizations
+              type: string
+          release: visualizations-usa  # Use a unique release name
+      - put: restart-deployments
+        resource: kubectl
+        params:
+          # Ensure the release name specified for visualizations/release matches the release specified above
+          kubectl: >
+            rollout restart deployment
+            $(kubectl get deployment -l visualizations/release=visualizations-usa -o custom-columns=:metadata.name)
           wait_until_ready: 600
