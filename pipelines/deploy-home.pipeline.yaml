@@ -19,7 +19,7 @@ resources:
     type: git
     icon: github
     source:
-      uri: https://github.com/aochen-jli/visualizations-home
+      uri: https://github.com/jsn-li/visualizations-home
       branch: main
       ignore_paths:
         - README.md
@@ -28,7 +28,7 @@ resources:
     type: git
     icon: github
     source:
-      uri: https://github.com/aochen-jli/visualizations-cicd
+      uri: https://github.com/jsn-li/visualizations-cicd
       branch: main
   - name: docker
     type: docker-image
